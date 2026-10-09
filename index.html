@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>M&amp;M's Fitness</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0c0a10;--card:#171320;--card2:#1f1a2b;--text:#f5f1f8;--muted:#9a90ab;--pink:#ff2d8f;--pink2:#ff7ac0;--line:#2a2338;
+color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:radial-gradient(500px 300px at 90% -5%,rgba(255,45,143,.28),transparent 70%),radial-gradient(400px 300px at -10% 40%,rgba(255,45,143,.12),transparent 70%),var(--bg);color:var(--text);font:15px/1.4 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;background-attachment:fixed}
+#app{max-width:480px;margin:0 auto;height:100%;display:flex;flex-direction:column}
+main{flex:1;overflow-y:auto;padding:18px 16px 24px}
+.logo{font:800 13px Unbounded,Arial,sans-serif;letter-spacing:.12em;color:var(--pink2)}
+h1{font:800 26px/1.15 Unbounded,Arial,sans-serif;margin:6px 0 18px}
+h1 em{font-style:normal;color:var(--pink)}
+h2{font:700 12px Unbounded,Arial,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:22px 0 10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:12px}
+.hero{display:flex;align-items:center;gap:18px;background:linear-gradient(135deg,#2a1230,#171320 70%);border-color:#3b1d46}
+.ring{width:104px;height:104px;border-radius:50%;flex:none;display:grid;place-items:center;background:conic-gradient(var(--pink) calc(var(--p)*1%),#2d2540 0)}
+.ring div{width:82px;height:82px;border-radius:50%;background:#1a1224;display:grid;place-items:center;text-align:center;font:800 30px/1 Unbounded,Arial,sans-serif}
+.ring small{display:block;font:500 11px Arial,sans-serif;color:var(--muted);margin-top:2px}
+.muted{color:var(--muted);font-size:13px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.time{font:700 14px Unbounded,Arial,sans-serif;color:var(--pink2)}
+.tag{font-size:11px;padding:4px 10px;border-radius:20px;background:rgba(255,45,143,.15);color:var(--pink2);white-space:nowrap}
+.tag.k{background:rgba(120,200,255,.14);color:#8fd0ff}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;align-items:stretch}
+.wk{align-self:center;writing-mode:vertical-rl;transform:rotate(180deg);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--pink2);padding:0 2px;white-space:nowrap}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:14px;padding:10px 14px;font:inherit;white-space:nowrap;cursor:pointer;text-align:center}
+.chip.on{background:linear-gradient(135deg,var(--pink),#c81f7a);border-color:transparent;font-weight:700}
+.cls{width:100%;text-align:left;color:var(--text);font:inherit;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:10px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.cls.on{border-color:var(--pink);background:#241228;box-shadow:0 0 0 1px var(--pink) inset}
+.cls:disabled{opacity:.4;cursor:default}
+.cls b{display:block;font-size:16px;margin-top:3px}
+.cta{width:100%;margin-top:10px;border:0;border-radius:16px;padding:16px;font:700 15px Unbounded,Arial,sans-serif;color:#fff;background:linear-gradient(135deg,var(--pink),#c81f7a);box-shadow:0 8px 24px rgba(255,45,143,.35);cursor:pointer}
+.cta:disabled{opacity:.35;box-shadow:none}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px}
+.stat b{font:800 26px Unbounded,Arial,sans-serif;color:var(--pink2);display:block}
+.item{padding:12px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border:0}
+.pr{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.pr:last-child{border:0}.pr b{color:var(--text);white-space:nowrap}
+.info a{color:var(--pink2);text-decoration:none}
+nav{display:flex;background:rgba(18,14,26,.92);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;border:0;background:none;color:var(--muted);padding:10px 4px 12px;font:600 11px Arial,sans-serif;cursor:pointer}
+nav button b{display:block;font-size:20px;font-weight:400;filter:grayscale(1)}
+nav button.on{color:var(--pink)}nav button.on b{filter:none}
+#toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:var(--pink);color:#fff;padding:11px 18px;border-radius:14px;font-weight:600;font-size:14px;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;text-align:center}
+#toast.show{opacity:1}
+.dots i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:3px;background:var(--pink)}.dots i:nth-child(2){background:#ffb347}.dots i:nth-child(3){background:#7ad7ff}
+.ghost{width:100%;margin-top:10px;background:none;border:1px solid var(--pink);color:var(--pink2);border-radius:16px;padding:13px;font:600 15px inherit;cursor:pointer}
+.arr{display:inline-block;animation:bob 1.2s ease-in-out infinite}@keyframes bob{50%{transform:translateY(4px)}}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px;margin-bottom:6px}
+.seg button{flex:1;border:0;background:none;color:var(--muted);padding:10px;border-radius:10px;font:600 14px inherit;cursor:pointer}
+.seg button.on{background:linear-gradient(135deg,var(--pink),#c81f7a);color:#fff}
+.day{margin-top:16px}.dh{font:700 13px Unbounded,Arial,sans-serif;color:var(--pink2);text-transform:capitalize;margin-bottom:8px}
+.rowc{width:100%;display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:6px;color:var(--text);font:inherit;text-align:left;cursor:pointer}
+.rowc .nm{flex:1}.rowc.on{border-color:var(--pink);background:#241228}.rowc:disabled{opacity:.4;cursor:default}
+.sticky{position:sticky;bottom:0;padding:14px 0 4px;background:linear-gradient(transparent,var(--bg) 35%)}
+.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stats3 .stat{padding:12px}.stats3 .stat b{font-size:22px}
+.bars{display:flex;justify-content:space-around;align-items:flex-end;height:110px}.bc{text-align:center}.bc small{color:var(--muted);font-size:11px;display:block;margin-top:6px}
+.bv{width:34px;background:linear-gradient(var(--pink),#7a1a52);border-radius:8px 8px 4px 4px;display:flex;justify-content:center;padding-top:3px}.bv span{font:700 11px Arial}
+.mh{font:700 12px Unbounded,Arial,sans-serif;color:var(--muted);text-transform:capitalize;margin:16px 0 8px 22px}
+.tlw{border-left:2px solid var(--line);margin-left:6px;padding-left:16px}
+.tl{position:relative;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:8px;cursor:pointer}
+.tl i{position:absolute;left:-25px;top:20px;width:10px;height:10px;border-radius:50%;background:var(--pink);box-shadow:0 0 0 4px var(--bg)}.tl.on{border-color:var(--pink)}
+.logo{font-size:24px}.dots i{width:12px;height:12px}.names{padding:2px 14px 10px;line-height:1.5}
+.rl{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}.rl .n{font:800 22px Unbounded,Arial,sans-serif;color:var(--pink)}
+.chk{display:flex;gap:10px;align-items:flex-start;margin:14px 0;font-size:14px}.chk input{width:22px;height:22px;accent-color:var(--pink);flex:none}
+.in{width:100%;margin-bottom:10px;padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--text);font:16px Arial,sans-serif}.in:focus{outline:none;border-color:var(--pink)}
+.btn2{display:inline-block;margin:10px 8px 0 0;padding:10px 14px;border:1px solid var(--pink);border-radius:12px;color:var(--pink2)!important;text-decoration:none;font-weight:600}
+</style>
+</head>
+<body>
+<div id="app"><main id="view"></main><nav id="tabs"></nav></div>
+<div id="toast"></div>
+<script>
+var GREET='';var xfer=null,tab='home',sel={w:0,di:null,ci:null},opn=-1;
+function C(t,e,n,k,a){return{t:t,e:e,n:n,k:k,a:a}}
+var SCH={
+1:[C('8:20','9:20','Fitness Mix','a'),C('16:30','17:30','Mini Dance','k','3–5 р.'),C('17:30','18:30','Танці для дітей','k','9–13 р.'),C('18:30','19:30','Zumba Fitness','a'),C('19:30','20:30','Fitness Mix','a')],
+3:[C('8:20','9:20','Fitness Mix','a'),C('16:30','17:30','Танці для дітей','k','6–8 р.'),C('17:30','18:30','Танці для дітей','k','9–13 р.'),C('18:30','19:30','High Heels','a','18+'),C('19:30','20:30','Fitness Mix','a')],
+5:[C('8:20','9:20','Stretching','a'),C('16:30','17:30','Танці для дітей','k','6–8 р.'),C('17:30','18:30','High Heels','a','18+'),C('18:30','19:30','Zumba Fitness','a'),C('19:30','20:30','Stretching','a')]};
+var IG='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>';
+var LOGO='<div class="logo">M&amp;M\'s <span class="dots"><i></i><i></i><i></i></span></div>';
+function addDays(n){var d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+n);return d}
+function fmt(d,o){return d.toLocaleDateString('uk-UA',o||{weekday:'short',day:'numeric',month:'long'})}
+function startOf(d,t){var p=t.split(':'),x=new Date(d);x.setHours(+p[0],+p[1]);return x}
+function wk(d){var m=addDays(-((new Date().getDay()+6)%7));return Math.floor((d-m)/604800000)}
+function days(){var r=[];for(var i=0;i<14;i++){var d=addDays(i);if(SCH[d.getDay()])r.push(d)}return r}
+var upcoming=[];
+(function(){var ds=days(),d=ds[1]||ds[0];upcoming.push({d:d,c:SCH[d.getDay()][3]});
+})();
+function canBook(d,c){return startOf(d,c.t)-new Date()>=864e5}
+function booked(d,c){return upcoming.some(function(u){return +u.d===+d&&u.c===c})}
+function nextUp(){return upcoming.slice().sort(function(a,b){return startOf(a.d,a.c.t)-startOf(b.d,b.c.t)})[0]}
+function toast(t){var e=document.getElementById('toast');e.textContent=t;e.className='show';setTimeout(function(){e.className=''},2400)}
+function cn(c){return c.n+(c.a?' · '+c.a:'')}
+function rel(d){var n=Math.round((d-addDays(0))/864e5);return n===0?'сьогодні':n===1?'завтра':'через '+n+' дн.'}
+function soon(){var r=[],now=new Date();days().forEach(function(d,di){SCH[d.getDay()].forEach(function(c,ci){if(r.length<3&&canBook(d,c))r.push({d:d,c:c,di:di,ci:ci})})});return r}
+function pick(w,di,ci){sel.w=w;sel.di=di;sel.ci=ci;go('book')}
+function prices(){
+function g(t,rows){return '<div class="muted" style="margin:14px 0 4px;color:var(--pink2);font-weight:600">'+t+'</div>'+rows.map(function(r){return '<div class="pr"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>'}).join('')}
+return '<h2 id="prices">Ціни</h2><div class="card" style="padding-top:2px">'
++g('Разове тренування',[['Fitness Mix','150 грн'],['High Heels · 18+','150 грн'],['Zumba Fitness','150 грн'],['Stretching','150 грн'],['Дитячі танці','150 грн']])
++g('Абонемент на місяць · дорослі',[['Fitness Mix','1 500 грн'],['High Heels · 18+','1 000 грн'],['Zumba Fitness','1 000 грн']])
++g('Абонемент на місяць · діти',[['Групи від 3 років','1 000 грн'],['Групи від 5 років','1 000 грн'],['Групи від 7 років','1 500 грн'],['Групи від 9 років','1 500 грн']])
++'</div>'}
+function toPrices(){document.getElementById('prices').scrollIntoView({behavior:'smooth',block:'start'})}
+function home(){var n=nextUp();
+var list=soon().map(function(x){return '<button class="cls" onclick="pick('+wk(x.d)+','+x.di+','+x.ci+')"><div><span class="time">'+x.c.t+'</span> <span class="muted">· '+fmt(x.d,{weekday:'short',day:'numeric',month:'short'})+'</span><b>'+cn(x.c)+'</b></div><span class="muted">›</span></button>'}).join('');
+return LOGO+'<div style="margin-top:4px;font-size:16px">Фітнес-тренер Анна · Мерефа</div><h1 style="margin-top:14px">Привіт'+(GREET?', '+esc(GREET):'')+'! 👋</h1>'
++'<h2 style="margin-top:0">Твоє наступне заняття</h2>'+(n?'<div class="card hero" style="display:block"><div class="row"><span class="tag">🔔 нагадаю в Telegram</span><span class="muted">'+rel(n.d)+'</span></div><div class="time" style="margin-top:14px;font-size:22px">'+n.c.t+' – '+n.c.e+'</div><b style="font-size:20px;display:block;margin:4px 0">'+cn(n.c)+'</b><div class="muted">'+fmt(n.d,{weekday:'long',day:'numeric',month:'long'})+'</div>'+mv(n)+'</div>':'<div class="card muted">Поки немає запису</div>')
++'<button class="cta" onclick="go(\'book\')">Записатись на заняття</button>'
++'<button class="ghost" onclick="toPrices()">Ціни <span class="arr">↓</span></button>'
++'<h2>Найближчі заняття</h2>'+list+'<h2>Тренування в залі</h2><div class="card info muted">Запис на тренування в залі — напряму в Анни.<br><a class="btn2" href="tel:+380638076872">📞 Зателефонувати</a><a class="btn2" href="https://instagram.com/anka_fitness_" target="_blank" rel="noopener">'+IG+' Написати</a></div>'+prices()+'<h2>Правила</h2>'+rulesHtml()
++'<h2>Студія</h2><div class="card info muted">🏋️ Фітнес-тренер Анна<br>📍 Fitness Center Tor · Мерефа, Дніпропетровська, 154<br>📞 Анна: <a href="tel:+380638076872">063 807 68 72</a><br>📞 Зал: <a href="tel:+380951168818">095 116 88 18</a><br>'+IG+' <a href="https://instagram.com/anka_fitness_" target="_blank" rel="noopener">@anka_fitness_</a><br>'+IG+' <a href="https://instagram.com/_fitness_club_tor_" target="_blank" rel="noopener">@_fitness_club_tor_</a></div><button class="ghost" onclick="go(\'owner\')">Кабінет тренера (демо)</button>'}
+function book(){var ds=days(),now=new Date(),any=false;
+var seg=[['Цей тиждень',0],['Наступний тиждень',1]].map(function(w){return '<button class="'+(sel.w===w[1]?'on':'')+'" onclick="sel.w='+w[1]+';sel.di=null;sel.ci=null;draw()">'+w[0]+'</button>'}).join('');
+var body=ds.map(function(d,di){if(wk(d)!==sel.w)return '';any=true;
+return '<div class="day"><div class="dh">'+fmt(d,{weekday:'long',day:'numeric',month:'long'})+'</div>'+SCH[d.getDay()].map(function(c,ci){var past=startOf(d,c.t)<now,late=!past&&!canBook(d,c),b=booked(d,c),off=past||b||late,on=sel.di===di&&sel.ci===ci;
+return '<button class="rowc'+(on?' on':'')+'"'+(off?' disabled':'')+' onclick="sel.di='+di+';sel.ci='+ci+';draw()"><span class="time">'+c.t+'</span><span class="nm">'+cn(c)+'</span>'+(b?'<span class="tag">ви записані</span>':past?'<span class="muted">минуло</span>':late?'<span class="muted" style="font-size:12px">менше 24 год</span>':on?'<span class="tag">✓</span>':'')+'</button>'}).join('')+'</div>'}).join('');
+var bar='';if(sel.di!==null){var d=ds[sel.di],c=SCH[d.getDay()][sel.ci];bar='<div class="sticky"><button class="cta" onclick="'+(xfer?'doMove()':'go(\'sign\')')+'">'+(xfer?'Перенести · ':'Далі · ')+fmt(d,{weekday:'short',day:'numeric',month:'short'})+', '+c.t+'</button></div>'}
+return LOGO+'<h1>'+(xfer?'Новий <em>час</em>':'Обери <em>заняття</em>')+'</h1>'+(xfer?'<div class="card"><b>Перенос заняття</b><div class="muted" style="margin:4px 0 10px">Зараз: '+fmt(xfer.d,{weekday:'short',day:'numeric',month:'short'})+', '+xfer.c.t+' · '+cn(xfer.c)+'<br>Переносити можна лише 1 раз.</div><button class="chip" onclick="xfer=null;draw()">Скасувати перенос</button></div>':'')+'<div class="seg">'+seg+'</div><div class="muted" style="margin:8px 2px 0">Запис — не менше ніж за 24 години до заняття.</div>'+(any?body:'<div class="card muted">На цьому тижні занять більше немає</div>')+bar}
+var NM=['Олена','Марія','Ірина','Софія','Катя','Наталя','Юля','Аня','Оксана'],ex='';
+function owner(){var ds=days(),tot=0;
+var body=ds.slice(0,6).map(function(d,di){return '<div class="day"><div class="dh">'+fmt(d,{weekday:'long',day:'numeric',month:'long'})+'</div>'+SCH[d.getDay()].map(function(c,ci){var b=booked(d,c),n=(d.getDate()*3+ci*2)%6+2+(b?1:0),k=di+'-'+ci,o=ex===k;tot+=n;
+var names=NM.slice(0,n-(b?1:0)).concat(upcoming.filter(function(u){return +u.d===+d&&u.c===c}).map(function(u){return (u.name||'Ви')+(u.phone?' ('+u.phone+(u.age?', дитина '+u.age+' р.':'')+')':'')}));
+return '<button class="rowc'+(o?' on':'')+'" onclick="ex=\''+(o?'':k)+'\';draw()"><span class="time">'+c.t+'</span><span class="nm">'+cn(c)+'</span><span class="tag">'+n+' зап.</span></button>'+(o?'<div class="muted names">'+names.join(', ')+'</div>':'')}).join('')+'</div>'}).join('');
+return LOGO+'<h1>Кабінет <em>тренера</em></h1><div class="muted">Усі записи в одному місці. Зараз дані умовні, справжні з’являться, коли додамо базу.</div><div class="stats3" style="margin-top:12px"><div class="stat"><b>'+tot+'</b><span class="muted">записів</span></div><div class="stat"><b>'+upcoming.length+'</b><span class="muted">нових</span></div></div>'+body+'<button class="ghost" onclick="go(\'home\')">← На головну</button>'}
+var F={name:'',phone:'',age:'',ok:false};
+function esc(t){return String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
+function rulesHtml(){var R=[['Запис','відбувається по 100% передоплаті, яка не повертається в разі вашої відсутності на тренуванні з будь-яких причин.'],['Термін дії','абонемент діє вказану кількість тижнів залежно від кількості годин, з першого дня його використання.'],['Перенос','запис на заняття повинен бути не менше ніж за 24 год до нього, або воно анулюється з будь-яких причин. Тренування може переноситись лише 1 раз, далі воно анулюється з будь-якої причини.']];
+return '<div class="card" style="padding-top:4px">'+R.map(function(r,i){return '<div class="rl"><span class="n">'+(i+1)+'</span><div><b>'+r[0]+'</b><div class="muted" style="margin-top:2px">'+r[1]+'</div></div></div>'}).join('')+'<div class="muted" style="padding-top:10px;color:var(--pink2)">При оплаті ви автоматично погоджуєтесь з цими правилами.</div></div>'}
+function sign(){var d=days()[sel.di],c=SCH[d.getDay()][sel.ci],kid=c.k==='k';
+return LOGO+'<h1>Перед <em>записом</em></h1><div class="card hero" style="display:block"><div class="time">'+c.t+' – '+c.e+'</div><b style="font-size:18px;display:block;margin:3px 0">'+cn(c)+'</b><div class="muted">'+fmt(d,{weekday:'long',day:'numeric',month:'long'})+'</div></div>'
++'<h2>Правила студії</h2>'+rulesHtml()+'<label class="chk"><input type="checkbox" '+(F.ok?'checked ':'')+'onchange="F.ok=this.checked;draw()"><span>Я прочитав(ла) правила і погоджуюсь з ними</span></label>'
++(F.ok?'<h2>Ваші дані</h2><input class="in" placeholder="Ім’я" value="'+esc(F.name)+'" oninput="F.name=this.value;upd()"><input class="in" type="tel" inputmode="tel" placeholder="Номер телефону" value="'+esc(F.phone)+'" oninput="F.phone=this.value;upd()">'+(kid?'<input class="in" type="number" inputmode="numeric" min="1" max="17" placeholder="Скільки років дитині" value="'+esc(F.age)+'" oninput="F.age=this.value;upd()">':'')+'<button class="cta" id="go" onclick="confirmBook()" disabled>Підтвердити запис</button>':'<button class="cta" disabled>Підтвердити запис</button>')
++'<button class="ghost" onclick="go(\'book\')">← Назад до розкладу</button>'}
+function upd(){var d=days()[sel.di],c=SCH[d.getDay()][sel.ci],kid=c.k==='k';var ok=F.name.trim().length>1&&F.phone.replace(/\D/g,'').length>=10&&(!kid||(+F.age>=1&&+F.age<=17));var b=document.getElementById('go');if(b)b.disabled=!ok}
+function mv(n){var t='<div class="muted" style="margin-top:12px">';
+if(n.moved)return t+'Це заняття вже переносилось. Повторний перенос неможливий.</div>';
+if(!canBook(n.d,n.c))return t+'Перенос можливий не пізніше ніж за 24 години до заняття.</div>';
+return '<button class="chip" style="margin-top:12px" onclick="xfer=nextUp();sel.di=null;sel.ci=null;sel.w=0;go(\'book\')">Перенести (можна 1 раз)</button>'}
+function doMove(){var d=days()[sel.di],c=SCH[d.getDay()][sel.ci];xfer.d=d;xfer.c=c;xfer.moved=true;xfer=null;sel.di=null;sel.ci=null;toast('Заняття перенесено ✓ '+fmt(d,{day:'numeric',month:'long'})+', '+c.t);go('home')}
+function confirmBook(){var d=days()[sel.di],c=SCH[d.getDay()][sel.ci];upcoming.push({d:d,c:c,name:F.name.trim(),phone:F.phone.trim(),age:c.k==='k'?F.age:''});F.ok=false;F.age='';sel.di=null;sel.ci=null;toast('Ви записані ✓ '+fmt(d,{day:'numeric',month:'long'})+', '+c.t+'. Нагадаю в Telegram');go('home')}
+function go(t){tab=t;draw();document.getElementById('view').scrollTop=0}
+function draw(){var v=document.getElementById('view'),y=v.scrollTop;v.innerHTML={home:home,book:book,owner:owner,sign:sign}[tab]();v.scrollTop=y;if(tab==='sign')upd();
+document.getElementById('tabs').innerHTML=[['home','🏠','Головна'],['book','📅','Запис']].map(function(t){return '<button class="'+(tab===t[0]?'on':'')+'" onclick="go(\''+t[0]+'\')"><b>'+t[1]+'</b>'+t[2]+'</button>'}).join('')}
+draw();
+try{var tg=window.Telegram&&Telegram.WebApp;if(tg){tg.ready();tg.expand();var u=tg.initDataUnsafe&&tg.initDataUnsafe.user;if(u&&u.first_name){F.name=u.first_name;GREET=u.first_name;draw()}}}catch(e){}
+</script>
+</body>
+</html>
