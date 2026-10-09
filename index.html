@@ -94,8 +94,11 @@ function startOf(d,t){var p=t.split(':'),x=new Date(d);x.setHours(+p[0],+p[1]);r
 function wk(d){var m=addDays(-((new Date().getDay()+6)%7));return Math.floor((d-m)/604800000)}
 function days(){var r=[];for(var i=0;i<14;i++){var d=addDays(i);if(SCH[d.getDay()])r.push(d)}return r}
 var upcoming=[];
-(function(){var ds=days(),d=ds[1]||ds[0];upcoming.push({d:d,c:SCH[d.getDay()][3]});
-})();
+load();
+var ADMINS=[];
+function isAdmin(){try{var u=Telegram.WebApp.initDataUnsafe.user;return !ADMINS.length||(u&&ADMINS.indexOf(u.id)>-1)}catch(e){return true}}
+function save(){try{localStorage.setItem('mm_bk',JSON.stringify(upcoming.map(function(u){return{d:+u.d,wd:u.d.getDay(),t:u.c.t,n:u.c.n,a:u.c.a||'',name:u.name,phone:u.phone,age:u.age,moved:!!u.moved}})))}catch(e){}}
+function load(){try{JSON.parse(localStorage.getItem('mm_bk')||'[]').forEach(function(x){var c=(SCH[x.wd]||[]).filter(function(c){return c.t===x.t&&c.n===x.n&&(c.a||'')===x.a})[0],d=new Date(x.d);if(c&&startOf(d,c.t)>new Date())upcoming.push({d:d,c:c,name:x.name,phone:x.phone,age:x.age,moved:x.moved})})}catch(e){}}
 function canBook(d,c){return startOf(d,c.t)-new Date()>=864e5}
 function booked(d,c){return upcoming.some(function(u){return +u.d===+d&&u.c===c})}
 function nextUp(){return upcoming.slice().sort(function(a,b){return startOf(a.d,a.c.t)-startOf(b.d,b.c.t)})[0]}
@@ -119,7 +122,7 @@ return LOGO+'<div style="margin-top:4px;font-size:16px">Фітнес-трене�
 +'<button class="cta" onclick="go(\'book\')">Записатись на заняття</button>'
 +'<button class="ghost" onclick="toPrices()">Ціни <span class="arr">↓</span></button>'
 +'<h2>Найближчі заняття</h2>'+list+'<h2>Тренування в залі</h2><div class="card info muted">Запис на тренування в залі — напряму в Анни.<br><a class="btn2" href="tel:+380638076872">📞 Зателефонувати</a><a class="btn2" href="https://instagram.com/anka_fitness_" target="_blank" rel="noopener">'+IG+' Написати</a></div>'+prices()+'<h2>Правила</h2>'+rulesHtml()
-+'<h2>Студія</h2><div class="card info muted">🏋️ Фітнес-тренер Анна<br>📍 Fitness Center Tor · Мерефа, Дніпропетровська, 154<br>📞 Анна: <a href="tel:+380638076872">063 807 68 72</a><br>📞 Зал: <a href="tel:+380951168818">095 116 88 18</a><br>'+IG+' <a href="https://instagram.com/anka_fitness_" target="_blank" rel="noopener">@anka_fitness_</a><br>'+IG+' <a href="https://instagram.com/_fitness_club_tor_" target="_blank" rel="noopener">@_fitness_club_tor_</a></div><button class="ghost" onclick="go(\'owner\')">Кабінет тренера (демо)</button>'}
++'<h2>Студія</h2><div class="card info muted">🏋️ Фітнес-тренер Анна<br>📍 Fitness Center Tor · Мерефа, Дніпропетровська, 154<br>📞 Анна: <a href="tel:+380638076872">063 807 68 72</a><br>📞 Зал: <a href="tel:+380951168818">095 116 88 18</a><br>'+IG+' <a href="https://instagram.com/anka_fitness_" target="_blank" rel="noopener">@anka_fitness_</a><br>'+IG+' <a href="https://instagram.com/_fitness_club_tor_" target="_blank" rel="noopener">@_fitness_club_tor_</a></div>'+(isAdmin()?'<button class="ghost" onclick="go(\'owner\')">Кабінет тренера</button>':'')}
 function book(){var ds=days(),now=new Date(),any=false;
 var seg=[['Цей тиждень',0],['Наступний тиждень',1]].map(function(w){return '<button class="'+(sel.w===w[1]?'on':'')+'" onclick="sel.w='+w[1]+';sel.di=null;sel.ci=null;draw()">'+w[0]+'</button>'}).join('');
 var body=ds.map(function(d,di){if(wk(d)!==sel.w)return '';any=true;
@@ -127,12 +130,9 @@ return '<div class="day"><div class="dh">'+fmt(d,{weekday:'long',day:'numeric',m
 return '<button class="rowc'+(on?' on':'')+'"'+(off?' disabled':'')+' onclick="sel.di='+di+';sel.ci='+ci+';draw()"><span class="time">'+c.t+'</span><span class="nm">'+cn(c)+'</span>'+(b?'<span class="tag">ви записані</span>':past?'<span class="muted">минуло</span>':late?'<span class="muted" style="font-size:12px">менше 24 год</span>':on?'<span class="tag">✓</span>':'')+'</button>'}).join('')+'</div>'}).join('');
 var bar='';if(sel.di!==null){var d=ds[sel.di],c=SCH[d.getDay()][sel.ci];bar='<div class="sticky"><button class="cta" onclick="'+(xfer?'doMove()':'go(\'sign\')')+'">'+(xfer?'Перенести · ':'Далі · ')+fmt(d,{weekday:'short',day:'numeric',month:'short'})+', '+c.t+'</button></div>'}
 return LOGO+'<h1>'+(xfer?'Новий <em>час</em>':'Обери <em>заняття</em>')+'</h1>'+(xfer?'<div class="card"><b>Перенос заняття</b><div class="muted" style="margin:4px 0 10px">Зараз: '+fmt(xfer.d,{weekday:'short',day:'numeric',month:'short'})+', '+xfer.c.t+' · '+cn(xfer.c)+'<br>Переносити можна лише 1 раз.</div><button class="chip" onclick="xfer=null;draw()">Скасувати перенос</button></div>':'')+'<div class="seg">'+seg+'</div><div class="muted" style="margin:8px 2px 0">Запис — не менше ніж за 24 години до заняття.</div>'+(any?body:'<div class="card muted">На цьому тижні занять більше немає</div>')+bar}
-var NM=['Олена','Марія','Ірина','Софія','Катя','Наталя','Юля','Аня','Оксана'],ex='';
-function owner(){var ds=days(),tot=0;
-var body=ds.slice(0,6).map(function(d,di){return '<div class="day"><div class="dh">'+fmt(d,{weekday:'long',day:'numeric',month:'long'})+'</div>'+SCH[d.getDay()].map(function(c,ci){var b=booked(d,c),n=(d.getDate()*3+ci*2)%6+2+(b?1:0),k=di+'-'+ci,o=ex===k;tot+=n;
-var names=NM.slice(0,n-(b?1:0)).concat(upcoming.filter(function(u){return +u.d===+d&&u.c===c}).map(function(u){return (u.name||'Ви')+(u.phone?' ('+u.phone+(u.age?', дитина '+u.age+' р.':'')+')':'')}));
-return '<button class="rowc'+(o?' on':'')+'" onclick="ex=\''+(o?'':k)+'\';draw()"><span class="time">'+c.t+'</span><span class="nm">'+cn(c)+'</span><span class="tag">'+n+' зап.</span></button>'+(o?'<div class="muted names">'+names.join(', ')+'</div>':'')}).join('')+'</div>'}).join('');
-return LOGO+'<h1>Кабінет <em>тренера</em></h1><div class="muted">Усі записи в одному місці. Зараз дані умовні, справжні з’являться, коли додамо базу.</div><div class="stats3" style="margin-top:12px"><div class="stat"><b>'+tot+'</b><span class="muted">записів</span></div><div class="stat"><b>'+upcoming.length+'</b><span class="muted">нових</span></div></div>'+body+'<button class="ghost" onclick="go(\'home\')">← На головну</button>'}
+function owner(){var list=upcoming.slice().sort(function(a,b){return startOf(a.d,a.c.t)-startOf(b.d,b.c.t)});
+var rows=list.map(function(u){return '<div class="card"><div class="time">'+u.c.t+' · '+fmt(u.d,{weekday:'short',day:'numeric',month:'short'})+'</div><b style="display:block;margin:3px 0">'+cn(u.c)+'</b><div class="muted">'+esc(u.name||'—')+' · '+esc(u.phone||'')+(u.age?' · дитина '+esc(u.age)+' р.':'')+'</div></div>'}).join('');
+return LOGO+'<h1>Кабінет <em>тренера</em></h1><div class="stats3" style="grid-template-columns:1fr"><div class="stat"><b>'+list.length+'</b><span class="muted">записів</span></div></div><h2>Записи</h2>'+(rows||'<div class="card muted">Поки немає записів.</div>')+'<div class="muted" style="margin:6px 2px 14px">Тут показуються записи з цього пристрою. Записи всіх клієнтів в одному місці з’являться, коли підключимо базу даних.</div><button class="ghost" onclick="go(\'home\')">← На головну</button>'}
 var F={name:'',phone:'',age:'',ok:false};
 function esc(t){return String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
 function rulesHtml(){var R=[['Запис','відбувається по 100% передоплаті, яка не повертається в разі вашої відсутності на тренуванні з будь-яких причин.'],['Термін дії','абонемент діє вказану кількість тижнів залежно від кількості годин, з першого дня його використання.'],['Перенос','запис на заняття повинен бути не менше ніж за 24 год до нього, або воно анулюється з будь-яких причин. Тренування може переноситись лише 1 раз, далі воно анулюється з будь-якої причини.']];
@@ -143,12 +143,12 @@ return LOGO+'<h1>Перед <em>записом</em></h1><div class="card hero" s
 +(F.ok?'<h2>Ваші дані</h2><input class="in" placeholder="Ім’я" value="'+esc(F.name)+'" oninput="F.name=this.value;upd()"><input class="in" type="tel" inputmode="tel" placeholder="Номер телефону" value="'+esc(F.phone)+'" oninput="F.phone=this.value;upd()">'+(kid?'<input class="in" type="number" inputmode="numeric" min="1" max="17" placeholder="Скільки років дитині" value="'+esc(F.age)+'" oninput="F.age=this.value;upd()">':'')+'<button class="cta" id="go" onclick="confirmBook()" disabled>Підтвердити запис</button>':'<button class="cta" disabled>Підтвердити запис</button>')
 +'<button class="ghost" onclick="go(\'book\')">← Назад до розкладу</button>'}
 function upd(){var d=days()[sel.di],c=SCH[d.getDay()][sel.ci],kid=c.k==='k';var ok=F.name.trim().length>1&&F.phone.replace(/\D/g,'').length>=10&&(!kid||(+F.age>=1&&+F.age<=17));var b=document.getElementById('go');if(b)b.disabled=!ok}
-function mv(n){var t='<div class="muted" style="margin-top:12px">';
+function mv(n){return '';var t='<div class="muted" style="margin-top:12px">';
 if(n.moved)return t+'Це заняття вже переносилось. Повторний перенос неможливий.</div>';
 if(!canBook(n.d,n.c))return t+'Перенос можливий не пізніше ніж за 24 години до заняття.</div>';
 return '<button class="chip" style="margin-top:12px" onclick="xfer=nextUp();sel.di=null;sel.ci=null;sel.w=0;go(\'book\')">Перенести (можна 1 раз)</button>'}
-function doMove(){var d=days()[sel.di],c=SCH[d.getDay()][sel.ci];xfer.d=d;xfer.c=c;xfer.moved=true;xfer=null;sel.di=null;sel.ci=null;toast('Заняття перенесено ✓ '+fmt(d,{day:'numeric',month:'long'})+', '+c.t);go('home')}
-function confirmBook(){var d=days()[sel.di],c=SCH[d.getDay()][sel.ci];upcoming.push({d:d,c:c,name:F.name.trim(),phone:F.phone.trim(),age:c.k==='k'?F.age:''});F.ok=false;F.age='';sel.di=null;sel.ci=null;toast('Ви записані ✓ '+fmt(d,{day:'numeric',month:'long'})+', '+c.t+'. Нагадаю в Telegram');go('home')}
+function doMove(){var d=days()[sel.di],c=SCH[d.getDay()][sel.ci];xfer.d=d;xfer.c=c;xfer.moved=true;save();xfer=null;sel.di=null;sel.ci=null;toast('Заняття перенесено ✓ '+fmt(d,{day:'numeric',month:'long'})+', '+c.t);go('home')}
+function confirmBook(){var d=days()[sel.di],c=SCH[d.getDay()][sel.ci];upcoming.push({d:d,c:c,name:F.name.trim(),phone:F.phone.trim(),age:c.k==='k'?F.age:''});save();F.ok=false;F.age='';sel.di=null;sel.ci=null;toast('Ви записані ✓ '+fmt(d,{day:'numeric',month:'long'})+', '+c.t+'. Нагадаю в Telegram');go('home')}
 function go(t){tab=t;draw();document.getElementById('view').scrollTop=0}
 function draw(){var v=document.getElementById('view'),y=v.scrollTop;v.innerHTML={home:home,book:book,owner:owner,sign:sign}[tab]();v.scrollTop=y;if(tab==='sign')upd();
 document.getElementById('tabs').innerHTML=[['home','🏠','Головна'],['book','📅','Запис']].map(function(t){return '<button class="'+(tab===t[0]?'on':'')+'" onclick="go(\''+t[0]+'\')"><b>'+t[1]+'</b>'+t[2]+'</button>'}).join('')}
